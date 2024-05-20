@@ -5,8 +5,41 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 )
+
+type AmexBill struct {
+	CalendarDate string
+	ID           string
+	Amount       float32
+	Item         string
+	Category     string
+}
+
+func removeWhitespace(s string) string {
+	return strings.ReplaceAll(s, " ", "")
+}
+
+func convertCSVToJSON(records [][]string) ([]AmexBill, error) {
+	var amexBillSection AmexBill
+	var amexBill []AmexBill
+
+	for _, val := range records {
+		amexBillSection.CalendarDate = removeWhitespace(val[0])
+		amexBillSection.ID = removeWhitespace(val[1])
+
+		parsedAmount, err := strconv.ParseFloat(removeWhitespace(val[2]), 32)
+		if err != nil {
+			return []AmexBill{}, fmt.Errorf("unable to parse amount from records: %v", err)
+		}
+		amexBillSection.Amount = float32(parsedAmount)
+
+		amexBillSection.Item = removeWhitespace(val[3])
+		amexBill = append(amexBill, amexBillSection)
+	}
+	return amexBill, nil
+}
 
 func main() {
 	path := "/Users/shayansadeghieh/amex-bills/ofx.csv"
@@ -22,22 +55,24 @@ func main() {
 
 	records, err := reader.ReadAll()
 	if err != nil {
-		fmt.Println("Error reading records")
+		log.Fatal("Error reading records from CSV")
 	}
 
-	csvMap := make(map[string]int)
-	csvMap["item"] = 3
+	recordsJSON, err := convertCSVToJSON(records)
+	if err != nil {
+		log.Fatalf("Error converting CSV to JSON: %v", err)
+	}
 
-	categorizedRecords := addCategory(records, csvMap)
+	categorizedRecords := enrich(recordsJSON)
 	fmt.Println(categorizedRecords)
 
 }
 
-func addCategory(records [][]string, csvMap map[string]int) [][]string {
-	for idx := range records {
-		records[idx] = append(records[idx], determineCategory(records[idx][csvMap["item"]]))
+func enrich(recordsJSON []AmexBill) []AmexBill {
+	for idx, record := range recordsJSON {
+		recordsJSON[idx].Category = determineCategory(record.Item)
 	}
-	return records
+	return recordsJSON
 }
 
 func determineCategory(item string) string {
@@ -57,9 +92,9 @@ func determineCategory(item string) string {
 		return "Google"
 	case strings.Contains(lowerItem, "beanfield"):
 		return "Internet"
-	case strings.Contains(lowerItem, "disney") || strings.Contains(lowerItem, "netflix"):
+	case strings.Contains(lowerItem, "disney") || strings.Contains(lowerItem, "netflix") || strings.Contains(lowerItem, "crave"):
 		return "Streaming"
-	case strings.Contains(lowerItem, "farmboy") || strings.Contains(lowerItem, "metro") || strings.Contains(lowerItem, "sobeys"):
+	case strings.Contains(lowerItem, "farmboy") || strings.Contains(lowerItem, "wal-mart") || strings.Contains(lowerItem, "metro") || strings.Contains(lowerItem, "sobeys"):
 		return "Groceries"
 	case strings.Contains(lowerItem, "aircanada") || strings.Contains(lowerItem, "air canada") || strings.Contains(lowerItem, "delta") || strings.Contains(lowerItem, "westjet") || strings.Contains(lowerItem, "flair"):
 		return "Flights"
@@ -77,7 +112,7 @@ func determineCategory(item string) string {
 		return "Amazon"
 	case strings.Contains(lowerItem, "argonaut"):
 		return "Fitness"
-	case strings.Contains(lowerItem, "starbucks"):
+	case strings.Contains(lowerItem, "starbucks") || strings.Contains(lowerItem, "tim hortons") || strings.Contains(lowerItem, "coffee"):
 		return "Coffee"
 	default:
 		return "Unknown"
