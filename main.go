@@ -12,7 +12,7 @@ func main() {
 
 	file, err := os.Open(path)
 	if err != nil {
-		log.Fatal("Error while reading the file", err)
+		log.Fatalf("Error while reading the file %v:", err)
 	}
 
 	defer file.Close()
@@ -21,7 +21,7 @@ func main() {
 
 	records, err := reader.ReadAll()
 	if err != nil {
-		log.Fatal("Error reading records from CSV")
+		log.Fatalf("Error reading records from CSV %v", err)
 	}
 
 	recordsJSON, err := convertCSVToJSON(records)
