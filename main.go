@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type AmexBill struct {
@@ -15,6 +16,9 @@ type AmexBill struct {
 	Amount       float32
 	Item         string
 	Category     string
+	Day          int
+	Month        int
+	Year         int
 }
 
 func removeWhitespace(s string) string {
@@ -63,16 +67,41 @@ func main() {
 		log.Fatalf("Error converting CSV to JSON: %v", err)
 	}
 
-	categorizedRecords := enrich(recordsJSON)
-	fmt.Println(categorizedRecords)
+	enrichRecords, err := enrich(recordsJSON)
+	if err != nil {
+		log.Fatalf("Error enriching records: %v", err)
+	}
+	fmt.Println(enrichRecords)
 
 }
 
-func enrich(recordsJSON []AmexBill) []AmexBill {
+func enrich(recordsJSON []AmexBill) ([]AmexBill, error) {
 	for idx, record := range recordsJSON {
 		recordsJSON[idx].Category = determineCategory(record.Item)
+		day, month, year, err := extractTimeInformation(record.CalendarDate)
+		if err != nil {
+			return []AmexBill{}, err
+		}
+
+		recordsJSON[idx].Day = day
+		recordsJSON[idx].Month = month
+		recordsJSON[idx].Year = year
+
 	}
-	return recordsJSON
+	return recordsJSON, nil
+}
+
+func extractTimeInformation(dateStr string) (int, int, int, error) {
+	t, err := time.Parse("01/02/2006", dateStr)
+	if err != nil {
+		return 0, 0, 0, fmt.Errorf("unable to parse time value from string: %v", err)
+	}
+
+	// Extract the year from the time object
+	year := t.Year()
+	month := int(t.Month())
+	day := t.Day()
+	return day, month, year, nil
 }
 
 func determineCategory(item string) string {
