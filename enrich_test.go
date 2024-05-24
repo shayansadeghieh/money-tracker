@@ -8,14 +8,14 @@ import (
 
 func TestEnrich(t *testing.T) {
 	testCases := []struct {
-		name             string
-		inputRecordsJSON []AmexBill
-		expRecordsJSON   []AmexBill
-		expError         error
+		name         string
+		inputRecords []AmexBill
+		expRecords   []AmexBill
+		expError     error
 	}{
 		{
-			name: "Normal recordsJSON",
-			inputRecordsJSON: []AmexBill{
+			name: "Normal records",
+			inputRecords: []AmexBill{
 				{
 					CalendarDate: "05/07/2023",
 					ID:           "123",
@@ -27,7 +27,7 @@ func TestEnrich(t *testing.T) {
 					Year:         0,
 				},
 			},
-			expRecordsJSON: []AmexBill{
+			expRecords: []AmexBill{
 				{
 					CalendarDate: "05/07/2023",
 					ID:           "123",
@@ -47,12 +47,12 @@ func TestEnrich(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Run the function being tested
-			recordsJSON, err := enrich(tc.inputRecordsJSON)
+			records, err := enrich(tc.inputRecords)
 			if err == nil && tc.expError != nil || err != nil && tc.expError == nil {
 				t.Errorf("Handling error: Got %v, but expected %v", tc.expError, err)
 			}
-			if !reflect.DeepEqual(recordsJSON, tc.expRecordsJSON) {
-				t.Errorf("Error enriching recordsJSON: Got %v, but expected %v", recordsJSON, tc.expRecordsJSON)
+			if !reflect.DeepEqual(records, tc.expRecords) {
+				t.Errorf("Error enriching records: Got %v, but expected %v", records, tc.expRecords)
 			}
 
 		})

@@ -23,15 +23,19 @@ func main() {
 		log.Fatalf("Error reading records from CSV %v", err)
 	}
 
-	recordsJSON, err := convertCSVToJSON(records)
+	recordsStruct, err := convertCSVToStruct(records)
 	if err != nil {
-		log.Fatalf("Error converting CSV to JSON: %v", err)
+		log.Fatalf("Error converting CSV to Struct: %v", err)
 	}
 
-	enrichRecords, err := enrich(recordsJSON)
-	handleUnknowns(enrichRecords)
+	enrichedRecords, err := enrich(recordsStruct)
 	if err != nil {
 		log.Fatalf("Error enriching records: %v", err)
+	}
+
+	err = upload(enrichedRecords)
+	if err != nil {
+		log.Fatalf("Failed to upload data to BigQuery: %v", err)
 	}
 
 }

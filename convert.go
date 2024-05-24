@@ -21,7 +21,7 @@ func removeWhitespace(s string) string {
 	return strings.ReplaceAll(s, " ", "")
 }
 
-func convertCSVToJSON(records [][]string) ([]AmexBill, error) {
+func convertCSVToStruct(records [][]string) ([]AmexBill, error) {
 	var amexBillSection AmexBill
 	var amexBill []AmexBill
 
