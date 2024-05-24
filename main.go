@@ -28,10 +28,14 @@ func main() {
 		log.Fatalf("Error converting CSV to Struct: %v", err)
 	}
 
-	enrichRecords, err := enrich(recordsStruct)
-	handleUnknowns(enrichRecords)
+	enrichedRecords, err := enrich(recordsStruct)
 	if err != nil {
 		log.Fatalf("Error enriching records: %v", err)
+	}
+
+	err = upload(enrichedRecords)
+	if err != nil {
+		log.Fatalf("Failed to upload data to BigQuery: %v", err)
 	}
 
 }
