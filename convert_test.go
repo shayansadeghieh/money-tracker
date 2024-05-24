@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestConvertCSVToJSON(t *testing.T) {
+func TestConvertCSVToStruct(t *testing.T) {
 	testCases := []struct {
 		name      string
 		records   [][]string
@@ -42,12 +42,12 @@ func TestConvertCSVToJSON(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Run the function being tested
-			recordsJSON, err := convertCSVToJSON(tc.records)
+			recordsStruct, err := convertCSVToStruct(tc.records)
 			if err == nil && tc.expError != nil || err != nil && tc.expError == nil {
 				t.Errorf("Error when handling non-nil error: Got %v, but expected %v", tc.expError, err)
 			}
-			if !reflect.DeepEqual(recordsJSON, tc.expOutput) {
-				t.Errorf("Error converting records CSV to JSON: Got %v, but expected %v", recordsJSON, tc.expOutput)
+			if !reflect.DeepEqual(recordsStruct, tc.expOutput) {
+				t.Errorf("Error converting records CSV to Struct: Got %v, but expected %v", recordsStruct, tc.expOutput)
 			}
 
 		})

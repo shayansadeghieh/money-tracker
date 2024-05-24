@@ -6,20 +6,20 @@ import (
 	"time"
 )
 
-func enrich(recordsJSON []AmexBill) ([]AmexBill, error) {
-	for idx, record := range recordsJSON {
-		recordsJSON[idx].Category = determineCategory(record.Item)
+func enrich(records []AmexBill) ([]AmexBill, error) {
+	for idx, record := range records {
+		records[idx].Category = determineCategory(record.Item)
 		day, month, year, err := extractTimeInformation(record.CalendarDate)
 		if err != nil {
 			return []AmexBill{}, err
 		}
 
-		recordsJSON[idx].Day = day
-		recordsJSON[idx].Month = month
-		recordsJSON[idx].Year = year
+		records[idx].Day = day
+		records[idx].Month = month
+		records[idx].Year = year
 
 	}
-	return recordsJSON, nil
+	return records, nil
 }
 
 func extractTimeInformation(dateStr string) (int, int, int, error) {

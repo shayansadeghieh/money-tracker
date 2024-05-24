@@ -23,12 +23,12 @@ func main() {
 		log.Fatalf("Error reading records from CSV %v", err)
 	}
 
-	recordsJSON, err := convertCSVToJSON(records)
+	recordsStruct, err := convertCSVToStruct(records)
 	if err != nil {
-		log.Fatalf("Error converting CSV to JSON: %v", err)
+		log.Fatalf("Error converting CSV to Struct: %v", err)
 	}
 
-	enrichRecords, err := enrich(recordsJSON)
+	enrichRecords, err := enrich(recordsStruct)
 	handleUnknowns(enrichRecords)
 	if err != nil {
 		log.Fatalf("Error enriching records: %v", err)
