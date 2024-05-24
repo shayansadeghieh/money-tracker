@@ -16,14 +16,14 @@ func TestConvertCSVToJSON(t *testing.T) {
 		{
 			name: "Normal records",
 			records: [][]string{{
-				"01/03/2024", "1234", "278.6", "shoes",
+				"01/03/2024", "1234", "278.6", "shoestoronto",
 			}},
 			expOutput: []AmexBill{
 				{
 					CalendarDate: "01/03/2024",
 					ID:           "1234",
 					Amount:       278.6,
-					Item:         "shoes",
+					Item:         "shoestoronto",
 				},
 			},
 			expError: nil,

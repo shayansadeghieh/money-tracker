@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/csv"
-	"fmt"
 	"log"
 	"os"
 )
@@ -30,9 +29,9 @@ func main() {
 	}
 
 	enrichRecords, err := enrich(recordsJSON)
+	handleUnknowns(enrichRecords)
 	if err != nil {
 		log.Fatalf("Error enriching records: %v", err)
 	}
-	fmt.Println(enrichRecords)
 
 }
